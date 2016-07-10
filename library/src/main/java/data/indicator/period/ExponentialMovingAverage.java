@@ -1,17 +1,18 @@
-package data.indicator.lag;
+package data.indicator.period;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import data.common.CandleStick;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExponentialMovingAverage extends LagIndicator {
+public class ExponentialMovingAverage extends PeriodIndicator {
 
     private double multiplier;
 
     @Inject
-    public ExponentialMovingAverage(@Named("exponentialMovingAverage.period") int period) {
+    public ExponentialMovingAverage(@Named("periodIndicator.exponentialMovingAverage.period") int period) {
         super(period);
         setMultiplier();
     }
@@ -25,9 +26,9 @@ public class ExponentialMovingAverage extends LagIndicator {
      * conform to the API that all other lag indicators would use.
      */
     @Override
-    void loadData() {
+    public void loadData() {
         while (hasNext()) {
-            List<Double> list = new ArrayList<>();
+            List<CandleStick> list = new ArrayList<>();
             list.add(getInputData().get(getStartIndex()));
             getData().add(calculateDataPoint(list));
             incrementIndices();
@@ -40,8 +41,8 @@ public class ExponentialMovingAverage extends LagIndicator {
     }
 
     @Override
-    double calculateDataPoint(List<Double> periodData) {
-        double priceToday = periodData.get(0);
+    double calculateDataPoint(List<CandleStick> periodData) {
+        double priceToday = periodData.get(0).getClose();
 
         if (getData().size() == 0) {
             return priceToday;

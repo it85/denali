@@ -1,12 +1,12 @@
-package data.indicator.lag;
+package data.indicator.period;
 
-import com.google.inject.Inject;
+import data.common.CandleStick;
 import data.indicator.Indicator;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class LagIndicator extends Indicator {
+public abstract class PeriodIndicator extends Indicator {
 
     private int period;
 
@@ -14,17 +14,18 @@ public abstract class LagIndicator extends Indicator {
     private int endIndex;
 
     /**
-     * Calculates and loads data points for this LagIndicator into {@link Indicator#data}. In theory, this should be
+     * Calculates and loads data points for this PeriodIndicator into {@link Indicator#data}. In theory, this should be
      * called by Guice immediately following construction assuming it resolved our dependency tree correctly.
      */
-    @Inject
-    void loadData() {
+//    @Inject
+    @Override
+    public void loadData() {
         while (hasNext()) {
             getData().add(calculateDataPoint(getPeriodData()));
         }
     }
 
-    public LagIndicator(int period) {
+    public PeriodIndicator(int period) {
         this.period = period;
 
         startIndex = 0;
@@ -43,8 +44,8 @@ public abstract class LagIndicator extends Indicator {
         return endIndex <= getInputData().size();
     }
 
-    List<Double> getPeriodData() {
-        List<Double> periodData = new ArrayList<>();
+    List<CandleStick> getPeriodData() {
+        List<CandleStick> periodData = new ArrayList<>();
 
         for (int i = startIndex; i < (startIndex + period); i++) {
             periodData.add(getInputData().get(i));
@@ -61,5 +62,5 @@ public abstract class LagIndicator extends Indicator {
     }
 
 
-    abstract double calculateDataPoint(List<Double> periodData);
+    abstract double calculateDataPoint(List<CandleStick> periodData);
 }
