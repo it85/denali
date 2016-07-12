@@ -2,8 +2,12 @@ package data.common;
 
 import utility.Builder;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 public class CandleStick {
 
+    private final LocalDate date;
     private final double open;
     private final double close;
     private final double high;
@@ -12,7 +16,8 @@ public class CandleStick {
     private final ClosingOutcome closingOutcome;
 
 
-    private CandleStick(double open, double close, double high, double low, double volume) {
+    private CandleStick(LocalDate date, double open, double close, double high, double low, double volume) {
+        this.date = date;
         this.open = open;
         this.close = close;
         this.high = high;
@@ -50,13 +55,25 @@ public class CandleStick {
 
     public ClosingOutcome getClosingOutcome() { return closingOutcome; }
 
+    public static CandleStickBuilder builder() {
+        return new CandleStickBuilder();
+    }
+
     public static class CandleStickBuilder implements Builder<CandleStick> {
 
+        private LocalDate builderDate;
         private double builderOpen;
         private double builderClose;
         private double builderHigh;
         private double builderLow;
         private double builderVolume;
+
+        private CandleStickBuilder() {}
+
+        public CandleStickBuilder date(LocalDate date) {
+            this.builderDate = date;
+            return this;
+        }
 
         public CandleStickBuilder open(double open) {
             this.builderOpen = open;
@@ -85,7 +102,8 @@ public class CandleStick {
 
         @Override
         public CandleStick build() {
-            return new CandleStick(builderOpen,
+            return new CandleStick(builderDate,
+                    builderOpen,
                     builderClose,
                     builderHigh,
                     builderLow,

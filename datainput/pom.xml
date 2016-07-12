@@ -11,4 +11,12 @@
 
     <artifactId>datainput</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.isaac</groupId>
+            <artifactId>library</artifactId>
+            <version>${library.version}</version>
+        </dependency>
+    </dependencies>
+
 </project>

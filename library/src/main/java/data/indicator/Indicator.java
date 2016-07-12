@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import data.common.CandleStick;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Indicator {

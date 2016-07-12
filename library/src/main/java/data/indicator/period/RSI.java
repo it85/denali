@@ -22,11 +22,11 @@ public class RSI extends PeriodIndicator {
             previousAverageGain = averageGain(periodData);
             previousAverageLoss = averageLoss(periodData);
 
-            if(previousAverageGain == 0) {
+            if (previousAverageGain == 0) {
                 return 0.0;
             }
 
-            if(previousAverageLoss == 0) {
+            if (previousAverageLoss == 0) {
                 return 100.0;
             }
 
@@ -56,7 +56,7 @@ public class RSI extends PeriodIndicator {
 
             double rs = averageGain / averageLoss;
             return rsi(rs);
-        } else{
+        } else {
             double rs = previousAverageGain / previousAverageLoss;
             return rsi(rs);
         }
@@ -75,7 +75,7 @@ public class RSI extends PeriodIndicator {
             }
         }
 
-        return sum / getPeriod();
+        return Math.abs(sum / getPeriod());
     }
 
     private double averageLoss(List<CandleStick> data) {
@@ -87,9 +87,12 @@ public class RSI extends PeriodIndicator {
             }
         }
 
-        return sum / getPeriod();
+        return Math.abs(sum / getPeriod());
     }
 
+    /**
+     * Returns the change of the most current candleStick in the data list parameter.
+     */
     private double currentOutcome(List<CandleStick> data) {
         CandleStick candleStick = data.get(data.size() - 1);
         return candleStick.getClose() - candleStick.getOpen();

@@ -2,6 +2,8 @@ package data.common.indicator;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import data.common.CandleStick;
 import data.indicator.Indicator;
 import data.indicator.IndicatorModule;
@@ -11,9 +13,11 @@ import data.indicator.period.SimpleMovingAverage;
 import data.indicator.period.StochRSI;
 import org.junit.Before;
 import org.junit.Test;
+import utility.parse.CSVParser;
+import utility.parse.Parser;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.io.File;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,10 +28,9 @@ import static org.junit.Assert.assertNotNull;
  * This unit test is only used to verify that injection is working correctly for all indicators and that bare-bones
  * calculations are outputting values as expected. The accuracy of these indicators is better tested in other unit tests.
  */
-public class IndicatorSmokeTest {
+public class IndicatorAccuracyTest {
 
     private static final double D_FUZZ = 0.0001;
-    private static final int DATA_SIZE = 28;
 
     private final List<Indicator> indicators = new ArrayList<>();
 
@@ -75,57 +78,70 @@ public class IndicatorSmokeTest {
 
     @Test
     public void smaTest() {
-        assertEquals(sma.getData().size(), 15);
+        assertEquals(sma.getData().size(), 118);
 
-        assertEquals(sma.getData().get(0), 7.5, 0.001);
-        assertEquals(sma.getData().get(1), 8.5, 0.001);
+        assertEquals(sma.getData().get(0), 2084.8157, D_FUZZ);
+        assertEquals(sma.getData().get(1), 2080.965, D_FUZZ);
     }
 
     @Test
     public void emaTest() {
         assertEquals(ema.getData().size(), data.size());
 
-        assertEquals(ema.getData().get(0), 1.0, D_FUZZ);
-        assertEquals(ema.getData().get(1), 1.1333, D_FUZZ);
-        assertEquals(ema.getData().get(2), 1.3822, D_FUZZ);
+        assertEquals(ema.getData().get(0), 2137.1599, D_FUZZ);
+        assertEquals(ema.getData().get(1), 2136.1919, D_FUZZ);
+        assertEquals(ema.getData().get(2), 2131.0863, D_FUZZ);
     }
 
     @Test
     public void rsiTest() {
-        assertEquals(rsi.getData().size(), 15);
+        assertEquals(rsi.getData().size(), 118);
 
-        assertEquals(rsi.getData().get(0), 100.0, D_FUZZ);
-        assertEquals(rsi.getData().get(1), 100.0, D_FUZZ);
+        assertEquals(rsi.getData().get(0), 16.4225, D_FUZZ);
+        assertEquals(rsi.getData().get(1), 21.3269, D_FUZZ);
     }
 
     @Test
     public void stochRsiTest() {
-        assertEquals(stochRsi.getData().size(), 15);
+        assertEquals(stochRsi.getData().size(), 118);
 
         assertEquals(stochRsi.getData().get(0), 0.0, D_FUZZ);
         assertEquals(stochRsi.getData().get(1), 0.0, D_FUZZ);
         assertEquals(stochRsi.getData().get(12), 0.0, D_FUZZ);
-        assertEquals(stochRsi.getData().get(13), 1.0, D_FUZZ);
-        assertEquals(stochRsi.getData().get(14), 1.0, D_FUZZ);
+        assertEquals(stochRsi.getData().get(13), 0.9924, D_FUZZ);
+        assertEquals(stochRsi.getData().get(14), 0.944, D_FUZZ);
     }
 
     private void initializeInputData() {
-        data = new ArrayList<>();
+        Config parentConf = ConfigFactory.load("application.conf");
 
-        for (int i = 0; i < DATA_SIZE; i++) {
-            double val = (double) i;
+        Config dataInputConf = parentConf.getConfig("application.data_input");
 
-            // initialize a nonsense candlestick
-            CandleStick candleStick = CandleStick.builder()
-                    .date(LocalDate.now())
-                    .open(val)
-                    .close(val + 1)
-                    .high(val + 2)
-                    .low(val + 3)
-                    .volume(val + 4)
-                    .build();
+        int dateIndex = dataInputConf.getInt("indices.date");
+        int openIndex = dataInputConf.getInt("indices.open");
+        int highIndex = dataInputConf.getInt("indices.high");
+        int lowIndex = dataInputConf.getInt("indices.low");
+        int closeIndex = dataInputConf.getInt("indices.close");
+        int volumeIndex = dataInputConf.getInt("indices.volume");
 
-            data.add(candleStick);
-        }
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern(dataInputConf.getString("data_format"));
+
+        Config applicationTestConf = parentConf.getConfig("application-test");
+
+        String fileLocation = applicationTestConf.getString("test_input_data_name");
+        boolean dailyData = applicationTestConf.getBoolean("test_input_data_daily");
+
+        Parser parser = CSVParser.builder()
+                .dateTimeFormatter(dtf)
+                .dateIndex(dateIndex)
+                .openIndex(openIndex)
+                .highIndex(highIndex)
+                .lowIndex(lowIndex)
+                .closeIndex(closeIndex)
+                .volumeIndex(volumeIndex)
+                .dailyData(dailyData)
+                .build();
+
+        data = parser.parse(new File(fileLocation));
     }
 }

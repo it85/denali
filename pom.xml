@@ -18,9 +18,6 @@
     <properties>
         <backtest-framework.version>1.0-SNAPSHOT</backtest-framework.version>
         <datainput.version>1.0-SNAPSHOT</datainput.version>
-        <guice.version>3.0</guice.version>
-        <java.version>1.8</java.version>
-        <junit.version>4.12</junit.version>
         <library.version>1.0-SNAPSHOT</library.version>
     </properties>
 
@@ -31,8 +28,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
         </plugins>
@@ -42,13 +39,13 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
+            <version>4.12</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
-            <version>${guice.version}</version>
+            <version>3.0</version>
         </dependency>
     </dependencies>
 
