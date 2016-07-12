@@ -3,7 +3,6 @@ package data.common;
 import utility.Builder;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public class CandleStick {
 
@@ -31,6 +30,10 @@ public class CandleStick {
         } else {
             closingOutcome = ClosingOutcome.FLAT;
         }
+    }
+
+    public LocalDate getDate() {
+        return date;
     }
 
     public double getOpen() {

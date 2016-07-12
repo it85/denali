@@ -8,13 +8,13 @@ import java.util.List;
 
 public abstract class Parser {
 
-    DateTimeFormatter dateTimeFormatter;
-    Integer dateIndex;
-    Integer openIndex;
-    Integer lowIndex;
-    Integer closeIndex;
-    Integer volumeIndex;
-    Integer highIndex;
+    final DateTimeFormatter dateTimeFormatter;
+    final Integer dateIndex;
+    final Integer openIndex;
+    final Integer lowIndex;
+    final Integer closeIndex;
+    final Integer volumeIndex;
+    final Integer highIndex;
 
     Parser(DateTimeFormatter dateTimeFormatter,
            Integer dateIndex,
