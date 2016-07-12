@@ -28,7 +28,7 @@ import static org.junit.Assert.assertNotNull;
  * This unit test is only used to verify that injection is working correctly for all indicators and that bare-bones
  * calculations are outputting values as expected. The accuracy of these indicators is better tested in other unit tests.
  */
-public class IndicatorAccuracyTest {
+public class IndicatorTest {
 
     private static final double D_FUZZ = 0.0001;
 
