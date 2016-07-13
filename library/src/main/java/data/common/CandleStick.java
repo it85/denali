@@ -58,6 +58,14 @@ public class CandleStick {
 
     public ClosingOutcome getClosingOutcome() { return closingOutcome; }
 
+    public double getCloseOpenSpread() {
+        return close - open;
+    }
+
+    public double getAbsCloseOpenSpread() {
+        return Math.abs(close - open);
+    }
+
     public static CandleStickBuilder builder() {
         return new CandleStickBuilder();
     }

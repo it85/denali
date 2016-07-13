@@ -78,38 +78,42 @@ public class IndicatorTest {
 
     @Test
     public void smaTest() {
-        assertEquals(sma.getData().size(), 118);
+        assertEquals(sma.getData().size(), 119);
 
-        assertEquals(sma.getData().get(0), 2084.8157, D_FUZZ);
-        assertEquals(sma.getData().get(1), 2080.965, D_FUZZ);
+        assertEquals(sma.getData().get(0), 1925.4357, D_FUZZ);
+        assertEquals(sma.getData().get(1), 1915.7514, D_FUZZ);
     }
 
     @Test
     public void emaTest() {
         assertEquals(ema.getData().size(), data.size());
 
-        assertEquals(ema.getData().get(0), 2137.1599, D_FUZZ);
-        assertEquals(ema.getData().get(1), 2136.1919, D_FUZZ);
-        assertEquals(ema.getData().get(2), 2131.0863, D_FUZZ);
+        assertEquals(ema.getData().get(0), 2012.6600, D_FUZZ);
+        assertEquals(ema.getData().get(1), 2013.2000, D_FUZZ);
+        assertEquals(ema.getData().get(2), 2010.1414, D_FUZZ);
+        assertEquals(ema.getData().get(3), 2001.2012, D_FUZZ);
+        assertEquals(ema.getData().get(4), 1990.6451, D_FUZZ);
     }
 
     @Test
     public void rsiTest() {
-        assertEquals(rsi.getData().size(), 118);
+        assertEquals(rsi.getData().size(), 119);
 
-        assertEquals(rsi.getData().get(0), 16.4225, D_FUZZ);
-        assertEquals(rsi.getData().get(1), 21.3269, D_FUZZ);
+        assertEquals(rsi.getData().get(0), 23.3666, D_FUZZ);
+        assertEquals(rsi.getData().get(1), 21.4225, D_FUZZ);
+        assertEquals(rsi.getData().get(2), 26.9876, D_FUZZ);
     }
 
     @Test
     public void stochRsiTest() {
-        assertEquals(stochRsi.getData().size(), 118);
+        // TODO: validate StochRSI data
+        assertEquals(stochRsi.getData().size(), 119);
 
         assertEquals(stochRsi.getData().get(0), 0.0, D_FUZZ);
         assertEquals(stochRsi.getData().get(1), 0.0, D_FUZZ);
         assertEquals(stochRsi.getData().get(12), 0.0, D_FUZZ);
-        assertEquals(stochRsi.getData().get(13), 0.9924, D_FUZZ);
-        assertEquals(stochRsi.getData().get(14), 0.944, D_FUZZ);
+        assertEquals(stochRsi.getData().get(13), 0.9061, D_FUZZ);
+        assertEquals(stochRsi.getData().get(14), 0.7264, D_FUZZ);
     }
 
     private void initializeInputData() {
@@ -130,6 +134,7 @@ public class IndicatorTest {
 
         String fileLocation = applicationTestConf.getString("test_input_data_name");
         boolean dailyData = applicationTestConf.getBoolean("test_input_data_daily");
+        boolean readReverse = applicationTestConf.getBoolean("data_read_reverse");
 
         Parser parser = CSVParser.builder()
                 .dateTimeFormatter(dtf)
@@ -140,6 +145,7 @@ public class IndicatorTest {
                 .closeIndex(closeIndex)
                 .volumeIndex(volumeIndex)
                 .dailyData(dailyData)
+                .readReverse(readReverse)
                 .build();
 
         data = parser.parse(new File(fileLocation));

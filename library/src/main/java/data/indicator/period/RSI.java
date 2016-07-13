@@ -36,10 +36,10 @@ public class RSI extends PeriodIndicator {
 
         double multiplier = getPeriod() - 1;
 
-        double currentOutcome = currentOutcome(periodData);
+        double currentOutcome = currentCloseOpenSpread(periodData);
 
         if (currentOutcome > 0) {
-            double averageGain = ((previousAverageGain * multiplier) + currentOutcome) / getPeriod();
+            double averageGain = ((previousAverageGain * multiplier) + Math.abs(currentOutcome)) / getPeriod();
             previousAverageGain = averageGain;
 
             double averageLoss = (previousAverageLoss * multiplier) / getPeriod();
@@ -51,7 +51,7 @@ public class RSI extends PeriodIndicator {
             double averageGain = (previousAverageGain * multiplier) / getPeriod();
             previousAverageGain = averageGain;
 
-            double averageLoss = ((previousAverageLoss * multiplier) + currentOutcome) / getPeriod();
+            double averageLoss = ((previousAverageLoss * multiplier) + Math.abs(currentOutcome)) / getPeriod();
             previousAverageLoss = averageLoss;
 
             double rs = averageGain / averageLoss;
@@ -71,7 +71,7 @@ public class RSI extends PeriodIndicator {
 
         for (CandleStick candleStick : data) {
             if (candleStick.getClosingOutcome() == CandleStick.ClosingOutcome.GAIN) {
-                sum += (candleStick.getHigh() - candleStick.getClose());
+                sum += candleStick.getCloseOpenSpread();
             }
         }
 
@@ -83,7 +83,7 @@ public class RSI extends PeriodIndicator {
 
         for (CandleStick candleStick : data) {
             if (candleStick.getClosingOutcome() == CandleStick.ClosingOutcome.LOSS) {
-                sum += (candleStick.getClose() - candleStick.getOpen());
+                sum += candleStick.getCloseOpenSpread();
             }
         }
 
@@ -93,8 +93,7 @@ public class RSI extends PeriodIndicator {
     /**
      * Returns the change of the most current candleStick in the data list parameter.
      */
-    private double currentOutcome(List<CandleStick> data) {
-        CandleStick candleStick = data.get(data.size() - 1);
-        return candleStick.getClose() - candleStick.getOpen();
+    private double currentCloseOpenSpread(List<CandleStick> data) {
+        return data.get(data.size() - 1).getCloseOpenSpread();
     }
 }

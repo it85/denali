@@ -3,13 +3,12 @@ package utility.parse;
 import data.common.CandleStick;
 import utility.Builder;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 public class CSVParser extends Parser {
 
@@ -19,6 +18,8 @@ public class CSVParser extends Parser {
     private final boolean dailyData;
 
     private BufferedReader reader;
+    private boolean readReverse;
+    private String LINE;
 
     private CSVParser(DateTimeFormatter dateTimeFormatter,
                       Integer dateIndex,
@@ -27,50 +28,93 @@ public class CSVParser extends Parser {
                       Integer closeIndex,
                       Integer volumeIndex,
                       Integer highIndex,
-                      boolean dailyData) {
+                      boolean dailyData,
+                      boolean readReverse) {
         super(dateTimeFormatter, dateIndex, openIndex, lowIndex, closeIndex, volumeIndex, highIndex);
 
         this.dailyData = dailyData;
+        this.readReverse = readReverse;
     }
 
     @Override
     public List<CandleStick> parse(File file) {
         List<CandleStick> output = new ArrayList<>();
-        String LINE;
 
         try {
             reader = new BufferedReader(new FileReader(file));
-            while ((LINE = reader.readLine()) != null) {
 
-                String[] data = LINE.split(DELIMITER);
-
-                String dateString = data[dateIndex];
-                dateString = dailyData ? (dateString + TIME_ADDENDUM) : dateString;
-
-                LocalDate date = LocalDate.parse(dateString, dateTimeFormatter);
-                double open = Double.parseDouble(data[openIndex]);
-                double low = Double.parseDouble(data[lowIndex]);
-                double close = Double.parseDouble(data[closeIndex]);
-                double volume = Double.parseDouble(data[volumeIndex]);
-                double high = Double.parseDouble(data[highIndex]);
-
-                CandleStick candleStick = CandleStick.builder()
-                        .date(date)
-                        .open(open)
-                        .low(low)
-                        .close(close)
-                        .volume(volume)
-                        .high(high)
-                        .build();
-
-                output.add(candleStick);
-
+            if (readReverse) {
+                parseAndLoadDataReversed(output, reader);
+            } else {
+                parseAndLoadData(output, reader);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return output;
+    }
+
+    private void parseAndLoadData(List<CandleStick> output, BufferedReader reader) throws IOException {
+        while ((LINE = reader.readLine()) != null) {
+
+            String[] data = LINE.split(DELIMITER);
+
+            String dateString = data[dateIndex];
+            dateString = dailyData ? (dateString + TIME_ADDENDUM) : dateString;
+
+            LocalDate date = LocalDate.parse(dateString, dateTimeFormatter);
+            double open = Double.parseDouble(data[openIndex]);
+            double low = Double.parseDouble(data[lowIndex]);
+            double close = Double.parseDouble(data[closeIndex]);
+            double volume = Double.parseDouble(data[volumeIndex]);
+            double high = Double.parseDouble(data[highIndex]);
+
+            CandleStick candleStick = CandleStick.builder()
+                    .date(date)
+                    .open(open)
+                    .low(low)
+                    .close(close)
+                    .volume(volume)
+                    .high(high)
+                    .build();
+
+            output.add(candleStick);
+        }
+    }
+
+    private void parseAndLoadDataReversed(List<CandleStick> output, BufferedReader reader) throws IOException {
+        Stack<String[]> dataStack = new Stack<>();
+
+        while ((LINE = reader.readLine()) != null) {
+            String[] data = LINE.split(DELIMITER);
+            dataStack.push(data);
+        }
+
+        while (!dataStack.empty()) {
+            String[] data = dataStack.pop();
+            String dateString = data[dateIndex];
+            dateString = dailyData ? (dateString + TIME_ADDENDUM) : dateString;
+
+            LocalDate date = LocalDate.parse(dateString, dateTimeFormatter);
+            double open = Double.parseDouble(data[openIndex]);
+            double low = Double.parseDouble(data[lowIndex]);
+            double close = Double.parseDouble(data[closeIndex]);
+            double volume = Double.parseDouble(data[volumeIndex]);
+            double high = Double.parseDouble(data[highIndex]);
+
+            CandleStick candleStick = CandleStick.builder()
+                    .date(date)
+                    .open(open)
+                    .low(low)
+                    .close(close)
+                    .volume(volume)
+                    .high(high)
+                    .build();
+
+            output.add(candleStick);
+        }
     }
 
     public static CSVParserBuilder builder() {
@@ -87,6 +131,7 @@ public class CSVParser extends Parser {
         Integer builderVolumeIndex;
         Integer builderHighIndex;
         boolean builderDailyData;
+        boolean builderReadReverse;
 
         private CSVParserBuilder() {}
 
@@ -130,6 +175,11 @@ public class CSVParser extends Parser {
             return this;
         }
 
+        public CSVParserBuilder readReverse(boolean readReverse) {
+            builderReadReverse = readReverse;
+            return this;
+        }
+
         @Override
         public CSVParser build() {
             return new CSVParser(builderDateTimeFormatter,
@@ -139,7 +189,8 @@ public class CSVParser extends Parser {
                     builderCloseIndex,
                     builderVolumeIndex,
                     builderHighIndex,
-                    builderDailyData);
+                    builderDailyData,
+                    builderReadReverse);
         }
 
     }
