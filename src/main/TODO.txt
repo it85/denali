@@ -1,0 +1,4 @@
+1. Refactor builders so that they have mandatory fields
+2. Refactor CSVParser so that we inject the indices because that should be configurable
+3. Clean up the dependency tree (CODE SMELL RIGHT NOW!)
+4. Refactor modules for testing, e.g. IndicatorSmokeTest is too tightly coupled with the conf file where the periods are defined. If we changed the periods, then the tests will break.
