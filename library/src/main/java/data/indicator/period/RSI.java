@@ -8,8 +8,8 @@ import java.util.List;
 
 public class RSI extends PeriodIndicator {
 
-    double previousAverageGain;
-    double previousAverageLoss;
+    private double previousAverageGain;
+    private double previousAverageLoss;
 
     @Inject
     public RSI(@Named("periodIndicator.rsi.period") int period) {
